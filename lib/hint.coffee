@@ -4,7 +4,7 @@ _ = require 'underscore'
 jshint = require('jshint').JSHINT
 
 defaultOptions = [
-  'undef'
+  'node'
   # options to relax for cs
   'eqnull'
   'expr'
@@ -13,11 +13,12 @@ defaultOptions = [
   'multistr'
 ]
 errorsToSkip = [
-  "Did you mean to return a conditional instead of an assignment?"
-  "Confusing use of '!'."
-  "Wrap the /regexp/ literal in parens to disambiguate the slash operator."
-  "Creating global 'for' variable. Should be 'for (var"
-  "Missing '()' invoking a constructor." # covered by coffeelint rule non_empty_constructor_needs_parens
+#  "Did you mean to return a conditional instead of an assignment?"
+#  "Confusing use of '!'."
+#  "Wrap the /regexp/ literal in parens to disambiguate the slash operator."
+#  "Creating global 'for' variable. Should be 'for (var"
+#  "Missing '()' invoking a constructor." # covered by coffeelint rule
+#non_empty_constructor_needs_parens
 ]
 
 # If log is true, prints out results after processing each file
@@ -40,7 +41,8 @@ hintFiles = (paths, config, log) ->
 
 hint = (coffeeSource, options, globals) ->
   csOptions = sourceMap: true, filename: "doesn't matter"
-  {js, v3SourceMap, sourceMap} = CoffeeScript.compile coffeeSource.toString(), csOptions
+  {js, v3SourceMap, sourceMap} = CoffeeScript.compile coffeeSource.toString(),
+    csOptions
   if jshint js, options, globals
     []
   else if not jshint.errors?
@@ -48,11 +50,13 @@ hint = (coffeeSource, options, globals) ->
     []
   else
     _.chain(jshint.errors)
-      # Last jshint.errors item could be null if it bailed because too many errors
+      # Last jshint.errors item could be null if it bailed because too many
+      # errors
       .compact()
       # Convert errors to use coffee source locations instead of js locations
       .map (error) ->
-        try [line, col] = sourceMap.sourceLocation [error.line - 1, error.character - 1]
+        try [line, col] = sourceMap.sourceLocation [error.line - 1,
+          error.character - 1]
         _.extend error,
           line: if line? then line + 1 else '?'
           character: if col? then col + 1 else '?'

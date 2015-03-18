@@ -34,7 +34,8 @@ switch
     {coffee, other} = _(argv._).groupBy (path) ->
       if /.+\.coffee$/.test path then "coffee" else "other"
     if argv.verbose and other?.length > 0
-      console.log "Skipping files that don't end in .coffee:\n" + other.join('\n')
+      console.log "Skipping files that don't end in .coffee:\n" +
+        other.join('\n')
 
     errors = hintFiles(coffee,
       options: splitArgs argv.options
